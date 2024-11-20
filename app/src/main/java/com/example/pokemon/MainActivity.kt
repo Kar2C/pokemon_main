@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,6 +36,8 @@ import com.example.pokemon.driverAdapters.PokemonDriverAdapter
 import com.example.pokemon.services.models.PokemonEntry
 import com.example.pokemon.services.models.PokemonResponse
 import com.example.pokemon.ui.theme.PokemonTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
@@ -47,6 +50,29 @@ class MainActivity : ComponentActivity() {
                 PokedexScreen()
             }
         }
+    }
+}
+
+@Composable
+fun Regiones(){
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = colorResource(id = R.color.purple_200)),
+        onClick = {
+
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val response = PokemonDriverAdapter.api.getRegions()
+                    // Loguear la respuesta o manejar los datos
+                    println("Regiones: ${response.results}")
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+
+        }) {
+        Text(text = "Ver Regiones", fontSize = 18.sp)
     }
 }
 
@@ -85,7 +111,10 @@ fun PokedexScreen() {
 
     // Composición de la UI
     Scaffold(
+        floatingActionButton = { Regiones() },
+
         topBar = { TopBar() },
+
         bottomBar = { BottomNavigationBar() }
     ) { innerPadding ->
         Column(
@@ -113,6 +142,10 @@ fun PokedexScreen() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar() {
+
+
+
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -159,6 +192,8 @@ fun SearchBar() {
         )
     }
 }
+
+
 
 @Composable
 fun PokemonGrid(pokemonList: List<PokemonEntry>) {
