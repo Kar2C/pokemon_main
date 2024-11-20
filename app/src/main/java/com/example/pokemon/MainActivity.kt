@@ -62,6 +62,7 @@ fun PokedexScreen() {
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     // Llamada a la API dentro de un LaunchedEffect para hacer la petición al cargar la pantalla
+
     LaunchedEffect(Unit) {
         isLoading = true
         errorMessage = null
@@ -80,6 +81,7 @@ fun PokedexScreen() {
             }
         }
     }
+
 
     // Composición de la UI
     Scaffold(
