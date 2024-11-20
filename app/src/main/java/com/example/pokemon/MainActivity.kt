@@ -142,10 +142,6 @@ fun PokedexScreen() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar() {
-
-
-
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -192,8 +188,6 @@ fun SearchBar() {
         )
     }
 }
-
-
 
 @Composable
 fun PokemonGrid(pokemonList: List<PokemonEntry>) {
