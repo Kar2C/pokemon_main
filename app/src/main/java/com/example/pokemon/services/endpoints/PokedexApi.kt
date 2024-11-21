@@ -17,8 +17,6 @@ interface PokedexApi {
 
     @GET("region/")
     suspend fun getRegions(): RegionResponse
-
-
 }
 
 data class RegionResponse(val results: List<Region>)
