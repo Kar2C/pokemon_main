@@ -25,7 +25,6 @@ data class PokemonSprites(
     val front_shiny: String     // Imagen shiny
 )
 
-
 data class RegionResponse(
     val results: List<Region>
 )
