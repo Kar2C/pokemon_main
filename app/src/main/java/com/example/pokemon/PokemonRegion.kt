@@ -22,25 +22,24 @@ fun ShowRegionPokemonScreen(regionName: String, navController: NavController) {
     var pokemonList by remember { mutableStateOf<List<PokemonEntry>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
 
-    // Ejecutar la llamada a la API al cargar la pantalla
     LaunchedEffect(regionName) {
         coroutineScope.launch {
             try {
                 when (regionName) {
                     "Kanto" -> {
-                        val response = PokemonDriverAdapter.api.getPokedexKanto() // Llamada a Kanto
+                        val response = PokemonDriverAdapter.api.getPokedexKanto()
                         if (response.isSuccessful) {
                             pokemonList = response.body()?.pokemon_entries ?: emptyList()
                         }
                     }
                     "Hoenn" -> {
-                        val response = PokemonDriverAdapter.api.getPokedexHoenn() // Llamada a Hoenn
+                        val response = PokemonDriverAdapter.api.getPokedexHoenn()
                         if (response.isSuccessful) {
                             pokemonList = response.body()?.pokemon_entries ?: emptyList()
                         }
                     }
                     "Galar" -> {
-                        val response = PokemonDriverAdapter.api.getPokedexGalar() // Llamada a galar
+                        val response = PokemonDriverAdapter.api.getPokedexGalar()
                         if (response.isSuccessful) {
                             pokemonList = response.body()?.pokemon_entries ?: emptyList()
                         }
@@ -57,6 +56,12 @@ fun ShowRegionPokemonScreen(regionName: String, navController: NavController) {
                             pokemonList = response.body()?.pokemon_entries ?: emptyList()
                         }
                     }
+                    "Alola" -> {
+                        val response = PokemonDriverAdapter.api.getPokedexAlola()
+                        if (response.isSuccessful) {
+                            pokemonList = response.body()?.pokemon_entries ?: emptyList()
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -65,8 +70,7 @@ fun ShowRegionPokemonScreen(regionName: String, navController: NavController) {
     }
 
     Scaffold(
-        topBar = { TopBar(navController) }, // Añadir TopBar con ícono de Home
-        bottomBar = { BottomNavigationBar() }
+        topBar = { TopBar(navController) },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -89,7 +93,6 @@ fun ShowRegionPokemonScreen(regionName: String, navController: NavController) {
                     val pokemon = pokemonList[index]
                     Button(
                         onClick = {
-                            // Aquí puedes navegar a la página de detalles del Pokémon
                             println("Clicked on Pokémon: ${pokemon.pokemon_species.name}")
                         },
                         modifier = Modifier.fillMaxWidth().padding(4.dp)

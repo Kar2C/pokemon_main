@@ -27,8 +27,9 @@ interface PokedexApi {
     @GET("pokedex/hisui/")
     suspend fun getPokedexHisui(): Response<PokemonResponse>
 
+    @GET("pokedex/alola/")
+    suspend fun getPokedexAlola(): Response<PokemonResponse>
 }
 
 data class RegionResponse(val results: List<Region>)
-
 data class Region(val name: String, val url: String)

@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
 fun PokedexApp() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "home") {
-        composable("home") { PokedexScreen(navController) }  // PokedexScreen con NavController
+        composable("home") { PokedexScreen(navController) }
         composable("region/{regionName}") { backStackEntry ->
             val regionName = backStackEntry.arguments?.getString("regionName")
             regionName?.let { ShowRegionPokemonScreen(regionName = it, navController = navController) }
@@ -43,8 +43,7 @@ fun PokedexApp() {
 @Composable
 fun PokedexScreen(navController: NavController) {
     Scaffold(
-        topBar = { TopBar(navController) }, // Añadir TopBar con navegación a Home
-        bottomBar = { BottomNavigationBar() }
+        topBar = { TopBar(navController) },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -56,7 +55,7 @@ fun PokedexScreen(navController: NavController) {
                     .fillMaxWidth()
                     .padding(16.dp),
                 onClick = {
-                    navController.navigate("region/Kanto") // Navegar a Kanto
+                    navController.navigate("region/Kanto")
                 }
             ) {
                 Text("Ver Pokémon de Kanto")
@@ -67,7 +66,7 @@ fun PokedexScreen(navController: NavController) {
                     .fillMaxWidth()
                     .padding(16.dp),
                 onClick = {
-                    navController.navigate("region/Hoenn") // Navegar a Hoenn
+                    navController.navigate("region/Hoenn")
                 }
             ) {
                 Text("Ver Pokémon de Hoenn")
@@ -77,7 +76,7 @@ fun PokedexScreen(navController: NavController) {
                     .fillMaxWidth()
                     .padding(16.dp),
                 onClick = {
-                    navController.navigate("region/Galar") // Navegar a Galar
+                    navController.navigate("region/Galar")
                 }
             ) {
                 Text("Ver Pokémon de Galar")
@@ -102,6 +101,16 @@ fun PokedexScreen(navController: NavController) {
             ) {
                 Text("Ver Pokémon de Hisui")
             }
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                onClick = {
+                    navController.navigate("region/Alola")
+                }
+            ) {
+                Text("Ver Pokémon de Alola")
+            }
         }
     }
 }
@@ -116,31 +125,14 @@ fun TopBar(navController: NavController) {
     ) {
         IconButton(onClick = { navController.navigate("home") }) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_home), // Utiliza el ícono adecuado para "Home"
-                contentDescription = "Home",
-            )
-        }
-        Spacer(modifier = Modifier.weight(1f)) // Empuja el texto hacia la izquierda
-        Text(
-            text = "Pokedex",
-            fontSize = 24.sp,
-        )
-    }
-}
-
-@Composable
-fun BottomNavigationBar() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceAround
-    ) {
-        IconButton(onClick = { /* Acción de Home */ }) {
-            Icon(
                 painter = painterResource(id = R.drawable.ic_home),
                 contentDescription = "Home",
             )
         }
+        Spacer(modifier = Modifier.weight(1f))
+        Text(
+            text = "Pokedex",
+            fontSize = 24.sp,
+        )
     }
 }
