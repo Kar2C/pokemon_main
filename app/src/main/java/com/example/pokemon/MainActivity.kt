@@ -92,6 +92,16 @@ fun PokedexScreen(navController: NavController) {
             ) {
                 Text("Ver Pokémon de Paldea")
             }
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                onClick = {
+                    navController.navigate("region/Hisui")
+                }
+            ) {
+                Text("Ver Pokémon de Hisui")
+            }
         }
     }
 }
