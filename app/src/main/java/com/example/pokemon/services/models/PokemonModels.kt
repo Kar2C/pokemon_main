@@ -16,15 +16,6 @@ data class PokemonSpecies(
     val url: String
 )
 
-data class PokemonDetails(
-    val sprites: PokemonSprites
-)
-
-data class PokemonSprites(
-    val front_default: String,   // Imagen normal
-    val front_shiny: String     // Imagen shiny
-)
-
 data class RegionResponse(
     val results: List<Region>
 )

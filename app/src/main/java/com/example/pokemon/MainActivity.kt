@@ -31,10 +31,10 @@ class MainActivity : ComponentActivity() {
 fun PokedexApp() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "home") {
-        composable("home") { PokedexScreen(navController) }
+        composable("home") { PokedexScreen(navController) }  // PokedexScreen con NavController
         composable("region/{regionName}") { backStackEntry ->
             val regionName = backStackEntry.arguments?.getString("regionName")
-            regionName?.let { ShowRegionPokemonScreen(regionName = it) }
+            regionName?.let { ShowRegionPokemonScreen(regionName = it, navController = navController) }
         }
     }
 }
@@ -43,7 +43,7 @@ fun PokedexApp() {
 @Composable
 fun PokedexScreen(navController: NavController) {
     Scaffold(
-        topBar = { TopBar() },
+        topBar = { TopBar(navController) }, // Añadir TopBar con navegación a Home
         bottomBar = { BottomNavigationBar() }
     ) { innerPadding ->
         Column(
@@ -56,23 +56,41 @@ fun PokedexScreen(navController: NavController) {
                     .fillMaxWidth()
                     .padding(16.dp),
                 onClick = {
-                    navController.navigate("region/Kanto")
+                    navController.navigate("region/Kanto") // Navegar a Kanto
                 }
             ) {
                 Text("Ver Pokémon de Kanto")
+            }
+
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                onClick = {
+                    navController.navigate("region/Hoenn") // Navegar a Hoenn
+                }
+            ) {
+                Text("Ver Pokémon de Hoenn")
             }
         }
     }
 }
 
 @Composable
-fun TopBar() {
+fun TopBar(navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        IconButton(onClick = { navController.navigate("home") }) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_home), // Utiliza el ícono adecuado para "Home"
+                contentDescription = "Home",
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f)) // Empuja el texto hacia la izquierda
         Text(
             text = "Pokedex",
             fontSize = 24.sp,
