@@ -39,6 +39,18 @@ fun ShowRegionPokemonScreen(regionName: String, navController: NavController) {
                             pokemonList = response.body()?.pokemon_entries ?: emptyList()
                         }
                     }
+                    "Galar" -> {
+                        val response = PokemonDriverAdapter.api.getPokedexGalar() // Llamada a galar
+                        if (response.isSuccessful) {
+                            pokemonList = response.body()?.pokemon_entries ?: emptyList()
+                        }
+                    }
+                    "Paldea" -> {
+                        val response = PokemonDriverAdapter.api.getPokedexPaldea()
+                        if (response.isSuccessful) {
+                            pokemonList = response.body()?.pokemon_entries ?: emptyList()
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

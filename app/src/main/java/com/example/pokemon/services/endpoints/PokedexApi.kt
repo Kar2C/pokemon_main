@@ -17,6 +17,13 @@ interface PokedexApi {
 
     @GET("pokedex/hoenn/")
     suspend fun getPokedexHoenn(): Response<PokemonResponse>
+
+    @GET("pokedex/galar/")
+    suspend fun getPokedexGalar(): Response<PokemonResponse>
+
+    @GET("pokedex/paldea/")
+    suspend fun getPokedexPaldea(): Response<PokemonResponse>
+
 }
 
 data class RegionResponse(val results: List<Region>)
