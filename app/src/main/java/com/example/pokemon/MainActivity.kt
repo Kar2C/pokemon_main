@@ -167,20 +167,38 @@ fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
                 .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            pokemonDetails?.let {
+            pokemonDetails?.let { details ->
+                // Nombre del Pokémon
                 Text(
-                    text = it.name.capitalize(),
+                    text = details.name.capitalize(),
                     fontSize = 24.sp,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
-                Text("Height: ${it.height}")
-                Text("Weight: ${it.weight}")
-                Text("Types: ${it.types.joinToString(", ") { type -> type.type.name.capitalize() }}")
-                // Aquí puedes agregar más información sobre el Pokémon si lo deseas
+                // Altura y peso
+                Text("Height: ${details.height} decimeters")
+                Text("Weight: ${details.weight} hectograms")
+
+                // Tipos
+                Text("Types: ${details.types.joinToString(", ") { type -> type.type.name.capitalize() }}")
+
+                // Habilidades
+                Text("Abilities: ${details.abilities.joinToString(", ") { ability -> ability.ability.name.capitalize() }}")
+
+                // Categoría
+                Text("Category: ${details.species.category.name.capitalize()}")
+
+                // Descripción (Flavor Text)
+                val description = details.species.flavor_text_entries.firstOrNull { it.language.name == "en" }?.flavor_text
+                Text("Description: ${description ?: "No description available"}")
+
+                // Movimientos
+                Text("Moves:")
+                details.moves.take(10).forEach { move ->
+                    Text("- ${move.move.name.capitalize()}")
+                }
             } ?: run {
-                Text("Cargando detalles del Pokémon...", modifier = Modifier.align(Alignment.CenterHorizontally))
+                Text("Loading Pokémon details...", modifier = Modifier.align(Alignment.CenterHorizontally))
             }
         }
     }
 }
-

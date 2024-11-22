@@ -29,7 +29,10 @@ data class PokemonDetail(
     val name: String,
     val height: Int,
     val weight: Int,
-    val types: List<PokemonTypeEntry>
+    val types: List<PokemonTypeEntry>, // Tipos del Pokémon
+    val abilities: List<PokemonAbilityEntry>, // Habilidades
+    val species: PokemonSpeciesDetail, // Información sobre la especie
+    val moves: List<PokemonMoveEntry> // Movimientos (ataques)
 )
 
 data class PokemonTypeEntry(
@@ -37,5 +40,42 @@ data class PokemonTypeEntry(
 )
 
 data class PokemonType(
+    val name: String
+)
+
+data class PokemonAbilityEntry(
+    val ability: Ability
+)
+
+data class Ability(
+    val name: String,
+    val url: String
+)
+
+data class PokemonSpeciesDetail(
+    val name: String,
+    val url: String,
+    val flavor_text_entries: List<FlavorTextEntry>, // Descripción del Pokémon
+    val category: Category // Categoría del Pokémon
+)
+
+data class FlavorTextEntry(
+    val flavor_text: String,
+    val language: Language
+)
+
+data class Language(
+    val name: String
+)
+
+data class Category(
+    val name: String
+)
+
+data class PokemonMoveEntry(
+    val move: PokemonMove
+)
+
+data class PokemonMove(
     val name: String
 )
