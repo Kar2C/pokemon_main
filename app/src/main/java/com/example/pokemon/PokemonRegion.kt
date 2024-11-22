@@ -56,12 +56,6 @@ fun ShowRegionPokemonScreen(regionName: String, navController: NavController) {
                             pokemonList = response.body()?.pokemon_entries ?: emptyList()
                         }
                     }
-                    "Alola" -> {
-                        val response = PokemonDriverAdapter.api.getPokedexAlola()
-                        if (response.isSuccessful) {
-                            pokemonList = response.body()?.pokemon_entries ?: emptyList()
-                        }
-                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -93,7 +87,8 @@ fun ShowRegionPokemonScreen(regionName: String, navController: NavController) {
                     val pokemon = pokemonList[index]
                     Button(
                         onClick = {
-                            println("Clicked on Pokémon: ${pokemon.pokemon_species.name}")
+                            // Navegar a la pantalla de detalles del Pokémon
+                            navController.navigate("pokemonDetail/${pokemon.pokemon_species.name}")
                         },
                         modifier = Modifier.fillMaxWidth().padding(4.dp)
                     ) {
@@ -101,6 +96,7 @@ fun ShowRegionPokemonScreen(regionName: String, navController: NavController) {
                     }
                 }
             }
+
         }
     }
 }

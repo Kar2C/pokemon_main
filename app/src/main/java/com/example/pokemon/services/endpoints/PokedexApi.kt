@@ -1,5 +1,6 @@
 package com.example.pokemon.services.endpoints
 
+import com.example.pokemon.services.models.PokemonDetail
 import com.example.pokemon.services.models.PokemonResponse
 import com.example.pokemon.services.models.RegionResponse
 import retrofit2.Call
@@ -27,8 +28,9 @@ interface PokedexApi {
     @GET("pokedex/hisui/")
     suspend fun getPokedexHisui(): Response<PokemonResponse>
 
-    @GET("pokedex/alola/")
-    suspend fun getPokedexAlola(): Response<PokemonResponse>
+    @GET("pokemon/{pokemonName}/")
+    suspend fun getPokemonDetails(@Path("pokemonName") pokemonName: String): Response<PokemonDetail>
+
 }
 
 data class RegionResponse(val results: List<Region>)

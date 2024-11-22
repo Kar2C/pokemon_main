@@ -24,3 +24,18 @@ data class Region(
     val name: String,
     val url: String
 )
+
+data class PokemonDetail(
+    val name: String,
+    val height: Int,
+    val weight: Int,
+    val types: List<PokemonTypeEntry>
+)
+
+data class PokemonTypeEntry(
+    val type: PokemonType
+)
+
+data class PokemonType(
+    val name: String
+)

@@ -6,7 +6,12 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -14,7 +19,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.*
+import com.example.pokemon.driverAdapters.PokemonDriverAdapter
+import com.example.pokemon.services.models.PokemonDetail
 import com.example.pokemon.ui.theme.PokemonTheme
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +44,12 @@ fun PokedexApp() {
             val regionName = backStackEntry.arguments?.getString("regionName")
             regionName?.let { ShowRegionPokemonScreen(regionName = it, navController = navController) }
         }
+        composable("pokemonDetail/{pokemonName}") { backStackEntry ->
+            val pokemonName = backStackEntry.arguments?.getString("pokemonName") ?: ""
+            PokemonDetailScreen(pokemonName = pokemonName, navController = navController)
+        }
     }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -101,16 +114,6 @@ fun PokedexScreen(navController: NavController) {
             ) {
                 Text("Ver Pokémon de Hisui")
             }
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                onClick = {
-                    navController.navigate("region/Alola")
-                }
-            ) {
-                Text("Ver Pokémon de Alola")
-            }
         }
     }
 }
@@ -136,3 +139,48 @@ fun TopBar(navController: NavController) {
         )
     }
 }
+
+@Composable
+fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
+    var pokemonDetails by remember { mutableStateOf<PokemonDetail?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(pokemonName) {
+        coroutineScope.launch {
+            try {
+                val response = PokemonDriverAdapter.api.getPokemonDetails(pokemonName)
+                if (response.isSuccessful) {
+                    pokemonDetails = response.body()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    Scaffold(
+        topBar = { TopBar(navController) },
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            pokemonDetails?.let {
+                Text(
+                    text = it.name.capitalize(),
+                    fontSize = 24.sp,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+                Text("Height: ${it.height}")
+                Text("Weight: ${it.weight}")
+                Text("Types: ${it.types.joinToString(", ") { type -> type.type.name.capitalize() }}")
+                // Aquí puedes agregar más información sobre el Pokémon si lo deseas
+            } ?: run {
+                Text("Cargando detalles del Pokémon...", modifier = Modifier.align(Alignment.CenterHorizontally))
+            }
+        }
+    }
+}
+
