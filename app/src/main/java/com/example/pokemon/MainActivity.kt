@@ -114,6 +114,46 @@ fun PokedexScreen(navController: NavController) {
             ) {
                 Text("Ver Pokémon de Hisui")
             }
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                onClick = {
+                    navController.navigate("region/original-johto")
+                }
+            ) {
+                Text("Ver Pokémon de Johto")
+            }
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                onClick = {
+                    navController.navigate("region/original-sinnoh")
+                }
+            ) {
+                Text("Ver Pokémon de Sinnoh")
+            }
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                onClick = {
+                    navController.navigate("region/original-unova")
+                }
+            ) {
+                Text("Ver Pokémon de Unova")
+            }
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                onClick = {
+                    navController.navigate("region/kalos-central")
+                }
+            ) {
+                Text("Ver Pokémon de Kalos")
+            }
         }
     }
 }

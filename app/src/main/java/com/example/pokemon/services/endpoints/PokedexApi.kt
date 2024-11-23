@@ -28,6 +28,18 @@ interface PokedexApi {
     @GET("pokedex/hisui/")
     suspend fun getPokedexHisui(): Response<PokemonResponse>
 
+    @GET("pokedex/original-johto/")
+    suspend fun getPokedexJohto(): Response<PokemonResponse>
+
+    @GET("pokedex/original-sinnoh/")
+    suspend fun getPokedexSinnoh(): Response<PokemonResponse>
+
+    @GET("pokedex/original-unova/")
+    suspend fun getPokedexUnova(): Response<PokemonResponse>
+
+    @GET("pokedex/kalos-central/")
+    suspend fun getPokedexkalos(): Response<PokemonResponse>
+
     @GET("pokemon/{pokemonName}/")
     suspend fun getPokemonDetails(@Path("pokemonName") pokemonName: String): Response<PokemonDetail>
 

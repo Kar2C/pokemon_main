@@ -56,6 +56,30 @@ fun ShowRegionPokemonScreen(regionName: String, navController: NavController) {
                             pokemonList = response.body()?.pokemon_entries ?: emptyList()
                         }
                     }
+                    "original-johto" -> {
+                        val response = PokemonDriverAdapter.api.getPokedexJohto()
+                        if (response.isSuccessful) {
+                            pokemonList = response.body()?.pokemon_entries ?: emptyList()
+                        }
+                    }
+                    "original-sinnoh" -> {
+                        val response = PokemonDriverAdapter.api.getPokedexSinnoh()
+                        if (response.isSuccessful) {
+                            pokemonList = response.body()?.pokemon_entries ?: emptyList()
+                        }
+                    }
+                    "original-unova" -> {
+                        val response = PokemonDriverAdapter.api.getPokedexUnova()
+                        if (response.isSuccessful) {
+                            pokemonList = response.body()?.pokemon_entries ?: emptyList()
+                        }
+                    }
+                    "kalos-central" -> {
+                        val response = PokemonDriverAdapter.api.getPokedexkalos()
+                        if (response.isSuccessful) {
+                            pokemonList = response.body()?.pokemon_entries ?: emptyList()
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
