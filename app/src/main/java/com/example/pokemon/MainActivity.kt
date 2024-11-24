@@ -4,8 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,23 +38,40 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun PokedexApp() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "home") {
-        composable("home") { PokedexScreen(navController) }
-        composable("region/{regionName}") { backStackEntry ->
-            val regionName = backStackEntry.arguments?.getString("regionName")
-            regionName?.let {
-                ShowRegionPokemonScreen(
-                    regionName = it,
-                    navController = navController
-                )
+    var selectedTabIndex by remember { mutableStateOf(0) } // Controlador de las pestañas
+
+    Column {
+        // Barra de pestañas con los botones "Regiones", "Pokemones", "Tipos"
+        TabRow(selectedTabIndex = selectedTabIndex, modifier = Modifier.fillMaxWidth()) {
+            Tab(selected = selectedTabIndex == 0, onClick = { selectedTabIndex = 0 }) {
+                Text("Regiones", modifier = Modifier.padding(16.dp))
+            }
+            Tab(selected = selectedTabIndex == 1, onClick = { selectedTabIndex = 1 }) {
+                Text("Pokemones", modifier = Modifier.padding(16.dp))
+            }
+            Tab(selected = selectedTabIndex == 2, onClick = { selectedTabIndex = 2 }) {
+                Text("Tipos", modifier = Modifier.padding(16.dp))
             }
         }
-        composable("pokemonDetail/{pokemonName}") { backStackEntry ->
-            val pokemonName = backStackEntry.arguments?.getString("pokemonName") ?: ""
-            PokemonDetailScreen(pokemonName = pokemonName, navController = navController)
+
+        // Aquí mostramos el contenido de acuerdo a la pestaña seleccionada
+        when (selectedTabIndex) {
+            0 -> PokedexScreen(navController)  // Si selecciona "Regiones", se muestra la lista de regiones
+            1 -> ShowUnderConstruction()      // Si selecciona "Pokemones", muestra "Está en proceso"
+            2 -> ShowUnderConstruction()      // Si selecciona "Tipos", muestra "Está en proceso"
         }
     }
+}
 
+// Pantalla para mostrar cuando "Pokemones" o "Tipos" están en proceso
+@Composable
+fun ShowUnderConstruction() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text("Está en proceso", fontSize = 24.sp)
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -177,16 +192,12 @@ fun PokedexScreen(navController: NavController) {
 
 @Composable
 fun TopBar(navController: NavController) {
-    var expanded by remember { mutableStateOf(false) } // Controlar la visibilidad del menú
-    var selectedOption by remember { mutableStateOf("Regiones") } // Opción seleccionada
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Icono de Home
         IconButton(onClick = { navController.navigate("home") }) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_home),
@@ -194,65 +205,10 @@ fun TopBar(navController: NavController) {
             )
         }
         Spacer(modifier = Modifier.weight(1f))
-
-        // Título "Pokedex"
         Text(
             text = "Pokedex",
             fontSize = 24.sp,
         )
-        Spacer(modifier = Modifier.width(16.dp))
-
-        // Botón para mostrar el menú desplegable
-        IconButton(onClick = { expanded = !expanded }) {
-            Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = "Menu"
-            )
-        }
-
-        // Menú desplegable con las opciones
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            val options = listOf("Regiones", "Pokémon", "Tipos")
-            options.forEach { option ->
-                DropdownMenuItem(onClick = {
-                    selectedOption = option
-                    expanded = false
-                }) {
-                    Text(text = option)  // Asegúrate de que se pase el texto correctamente
-                }
-            }
-        }
-    }
-
-    // Mostrar contenido según la opción seleccionada
-    when (selectedOption) {
-        "Regiones" -> {
-            // Navegar a la pantalla que muestra las regiones
-            navController.navigate("home")
-        }
-        "Pokémon" -> {
-            // Mostrar un mensaje de "Está en proceso"
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text("Está en proceso", fontSize = 20.sp)
-            }
-        }
-        "Tipos" -> {
-            // Mostrar un mensaje de "Está en proceso"
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text("Está en proceso", fontSize = 20.sp)
-            }
-        }
     }
 }
 
