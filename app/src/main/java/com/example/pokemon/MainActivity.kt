@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,7 +23,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.*
 import com.example.pokemon.driverAdapters.PokemonDriverAdapter
+import com.example.pokemon.services.models.Pokemon
 import com.example.pokemon.services.models.PokemonDetail
+import com.example.pokemon.services.models.PokemonEntry
 import com.example.pokemon.ui.theme.PokemonTheme
 import kotlinx.coroutines.launch
 
@@ -59,16 +64,11 @@ fun PokedexApp() {
             composable("home") {
                 // Cuando se selecciona "Regiones", mostramos la lista de regiones
                 if (selectedTabIndex == 0) {
-                    PokedexScreen(navController)
+                    PokedexScreen(navController)  // Pantalla de regiones
+                } else if (selectedTabIndex == 1) {
+                    PokemonListScreen(navController)  // Pantalla de Pokémon
                 } else {
                     ShowUnderConstruction() // En los demás casos, mostramos el mensaje de proceso
-                }
-            }
-
-            composable("region/{regionName}") { backStackEntry ->
-                val regionName = backStackEntry.arguments?.getString("regionName")
-                regionName?.let {
-                    ShowRegionPokemonScreen(regionName = it, navController = navController)
                 }
             }
 
@@ -76,9 +76,75 @@ fun PokedexApp() {
                 val pokemonName = backStackEntry.arguments?.getString("pokemonName") ?: ""
                 PokemonDetailScreen(pokemonName = pokemonName, navController = navController)
             }
+
+            // Navegar a las regiones, si se seleccionan
+            composable("region/{regionName}") { backStackEntry ->
+                val regionName = backStackEntry.arguments?.getString("regionName")
+                regionName?.let {
+                    ShowRegionPokemonScreen(regionName = it, navController = navController)
+                }
+            }
         }
     }
 }
+
+@Composable
+fun PokemonListScreen(navController: NavController) {
+    var pokemonList by remember { mutableStateOf<List<Pokemon>>(emptyList()) }
+    val coroutineScope = rememberCoroutineScope()
+
+    // Realizar la llamada a la API para obtener los Pokémon
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            try {
+                // Llamamos al API para obtener la lista de los 1500 Pokémon
+                val response = PokemonDriverAdapter.api.getPokemonList()
+                if (response.isSuccessful) {
+                    pokemonList = response.body()?.results ?: emptyList()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    Scaffold(
+        topBar = { TopBar(navController) },
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "Pokémon",
+                fontSize = 24.sp,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(8.dp)
+            ) {
+                items(pokemonList.size) { index ->
+                    val pokemon = pokemonList[index]
+                    Button(
+                        onClick = {
+                            // Navegar a la pantalla de detalles del Pokémon
+                            navController.navigate("pokemonDetail/${pokemon.name}")
+                        },
+                        modifier = Modifier.fillMaxWidth().padding(4.dp)
+                    ) {
+                        Text(text = pokemon.name.capitalize())
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 // Pantalla para mostrar cuando "Pokemones" o "Tipos" están en proceso
 @Composable
@@ -257,35 +323,15 @@ fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             pokemonDetails?.let { details ->
-                // Nombre del Pokémon
-                Text(
-                    text = details.name.capitalize(),
-                    fontSize = 24.sp,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-                // Altura y peso
+                // Mostrar detalles del Pokémon
+                Text(text = details.name.capitalize(), fontSize = 24.sp)
                 Text("Height: ${details.height} decimeters")
                 Text("Weight: ${details.weight} hectograms")
-
-                // Tipos
-                Text("Types: ${details.types.joinToString(", ") { type -> type.type.name.capitalize() }}")
-
-                // Habilidades
-                Text("Abilities: ${details.abilities.joinToString(", ") { ability -> ability.ability.name.capitalize() }}")
-
-                // Descripción (Flavor Text)
-                Text("Description: Aca va la descripcionnn")
-
-                // Movimientos
-                Text("Moves:")
-                details.moves.take(10).forEach { move ->
-                    Text("- ${move.move.name.capitalize()}")
-                }
+                Text("Types: ${details.types.joinToString(", ") { it.type.name.capitalize() }}")
+                Text("Abilities: ${details.abilities.joinToString(", ") { it.ability.name.capitalize() }}")
+                Text("Moves: ${details.moves.take(10).joinToString(", ") { it.move.name.capitalize() }}")
             } ?: run {
-                Text(
-                    "Loading Pokémon details...",
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
+                Text("Loading Pokémon details...")
             }
         }
     }

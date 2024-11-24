@@ -1,6 +1,7 @@
 package com.example.pokemon.services.endpoints
 
 import com.example.pokemon.services.models.PokemonDetail
+import com.example.pokemon.services.models.PokemonListResponse
 import com.example.pokemon.services.models.PokemonResponse
 import com.example.pokemon.services.models.RegionResponse
 import retrofit2.Call
@@ -45,6 +46,9 @@ interface PokedexApi {
 
     @GET("pokemon/{pokemonName}/")
     suspend fun getPokemonDetails(@Path("pokemonName") pokemonName: String): Response<PokemonDetail>
+
+    @GET("pokemon?limit=1500")
+    suspend fun getPokemonList(): Response<PokemonListResponse>
 
 }
 

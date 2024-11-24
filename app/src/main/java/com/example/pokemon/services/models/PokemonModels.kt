@@ -79,3 +79,13 @@ data class PokemonMoveEntry(
 data class PokemonMove(
     val name: String
 )
+
+data class PokemonListResponse(
+    val results: List<Pokemon>
+)
+
+data class Pokemon(
+    val name: String,
+    val url: String
+)
+
