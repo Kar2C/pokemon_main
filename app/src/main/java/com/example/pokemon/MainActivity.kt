@@ -54,11 +54,28 @@ fun PokedexApp() {
             }
         }
 
-        // Aquí mostramos el contenido de acuerdo a la pestaña seleccionada
-        when (selectedTabIndex) {
-            0 -> PokedexScreen(navController)  // Si selecciona "Regiones", se muestra la lista de regiones
-            1 -> ShowUnderConstruction()      // Si selecciona "Pokemones", muestra "Está en proceso"
-            2 -> ShowUnderConstruction()      // Si selecciona "Tipos", muestra "Está en proceso"
+        // Definimos la navegación
+        NavHost(navController = navController, startDestination = "home") {
+            composable("home") {
+                // Cuando se selecciona "Regiones", mostramos la lista de regiones
+                if (selectedTabIndex == 0) {
+                    PokedexScreen(navController)
+                } else {
+                    ShowUnderConstruction() // En los demás casos, mostramos el mensaje de proceso
+                }
+            }
+
+            composable("region/{regionName}") { backStackEntry ->
+                val regionName = backStackEntry.arguments?.getString("regionName")
+                regionName?.let {
+                    ShowRegionPokemonScreen(regionName = it, navController = navController)
+                }
+            }
+
+            composable("pokemonDetail/{pokemonName}") { backStackEntry ->
+                val pokemonName = backStackEntry.arguments?.getString("pokemonName") ?: ""
+                PokemonDetailScreen(pokemonName = pokemonName, navController = navController)
+            }
         }
     }
 }
