@@ -40,7 +40,8 @@ data class PokemonTypeEntry(
 )
 
 data class PokemonType(
-    val name: String
+    val name: String,
+    val url: String
 )
 
 data class PokemonAbilityEntry(
@@ -89,3 +90,6 @@ data class Pokemon(
     val url: String
 )
 
+data class PokemonTypeListResponse(
+    val results: List<PokemonType>
+)

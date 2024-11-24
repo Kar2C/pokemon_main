@@ -3,6 +3,7 @@ package com.example.pokemon.services.endpoints
 import com.example.pokemon.services.models.PokemonDetail
 import com.example.pokemon.services.models.PokemonListResponse
 import com.example.pokemon.services.models.PokemonResponse
+import com.example.pokemon.services.models.PokemonTypeListResponse
 import com.example.pokemon.services.models.RegionResponse
 import retrofit2.Call
 import retrofit2.Response
@@ -50,6 +51,8 @@ interface PokedexApi {
     @GET("pokemon?limit=1500")
     suspend fun getPokemonList(): Response<PokemonListResponse>
 
+    @GET("type/")
+    suspend fun getPokemonTypes(): Response<PokemonTypeListResponse>
 }
 
 data class RegionResponse(val results: List<Region>)

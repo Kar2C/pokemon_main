@@ -25,7 +25,7 @@ import androidx.navigation.compose.*
 import com.example.pokemon.driverAdapters.PokemonDriverAdapter
 import com.example.pokemon.services.models.Pokemon
 import com.example.pokemon.services.models.PokemonDetail
-import com.example.pokemon.services.models.PokemonEntry
+import com.example.pokemon.services.models.PokemonType
 import com.example.pokemon.ui.theme.PokemonTheme
 import kotlinx.coroutines.launch
 
@@ -44,6 +44,23 @@ class MainActivity : ComponentActivity() {
 fun PokedexApp() {
     val navController = rememberNavController()
     var selectedTabIndex by remember { mutableStateOf(0) } // Controlador de las pestañas
+    var pokemonTypes by remember { mutableStateOf<List<PokemonType>>(emptyList()) }
+    val coroutineScope = rememberCoroutineScope()
+
+    // Realizar la llamada a la API para obtener los tipos de Pokémon
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            try {
+                // Llamamos al API para obtener los tipos de Pokémon
+                val response = PokemonDriverAdapter.api.getPokemonTypes()
+                if (response.isSuccessful) {
+                    pokemonTypes = response.body()?.results ?: emptyList()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 
     Column {
         // Barra de pestañas con los botones "Regiones", "Pokemones", "Tipos"
@@ -67,8 +84,8 @@ fun PokedexApp() {
                     PokedexScreen(navController)  // Pantalla de regiones
                 } else if (selectedTabIndex == 1) {
                     PokemonListScreen(navController)  // Pantalla de Pokémon
-                } else {
-                    ShowUnderConstruction() // En los demás casos, mostramos el mensaje de proceso
+                } else if (selectedTabIndex == 2) {
+                    ShowPokemonTypes(pokemonTypes, navController) // Mostrar los tipos
                 }
             }
 
@@ -82,6 +99,46 @@ fun PokedexApp() {
                 val regionName = backStackEntry.arguments?.getString("regionName")
                 regionName?.let {
                     ShowRegionPokemonScreen(regionName = it, navController = navController)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ShowPokemonTypes(pokemonTypes: List<PokemonType>, navController: NavController) {
+    Scaffold(
+        topBar = { TopBar(navController) },
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "Tipos de Pokémon",
+                fontSize = 24.sp,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(8.dp)
+            ) {
+                items(pokemonTypes.size) { index ->
+                    val pokemonType = pokemonTypes[index]
+                    Button(
+                        onClick = {
+                            // Aquí puedes manejar la acción de selección del tipo
+                            // Por ejemplo, podrías navegar a una pantalla de Pokémon con ese tipo
+                            // Por ahora, simplemente se muestra el nombre
+                            println("Tipo seleccionado: ${pokemonType.name}")
+                        },
+                        modifier = Modifier.fillMaxWidth().padding(4.dp)
+                    ) {
+                        Text(text = pokemonType.name.capitalize())
+                    }
                 }
             }
         }
@@ -146,22 +203,15 @@ fun PokemonListScreen(navController: NavController) {
 }
 
 
-// Pantalla para mostrar cuando "Pokemones" o "Tipos" están en proceso
-@Composable
-fun ShowUnderConstruction() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Está en proceso", fontSize = 24.sp)
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PokedexScreen(navController: NavController) {
     Scaffold(
         topBar = { TopBar(navController) },
+        bottomBar = {
+            // Agregar botón Like en la parte inferior
+            BottomBarLikeButton()
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -269,6 +319,7 @@ fun PokedexScreen(navController: NavController) {
             ) {
                 Text("Ver Pokémon de Alola")
             }
+
         }
     }
 }
@@ -298,6 +349,7 @@ fun TopBar(navController: NavController) {
 @Composable
 fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
     var pokemonDetails by remember { mutableStateOf<PokemonDetail?>(null) }
+    var isFavorite by remember { mutableStateOf(false) }  // Estado para verificar si es favorito
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(pokemonName) {
@@ -315,6 +367,10 @@ fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
 
     Scaffold(
         topBar = { TopBar(navController) },
+        bottomBar = {
+            // Botón "Like" en la parte inferior de todas las pantallas
+            BottomBarLikeButton()
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -323,16 +379,44 @@ fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             pokemonDetails?.let { details ->
-                // Mostrar detalles del Pokémon
                 Text(text = details.name.capitalize(), fontSize = 24.sp)
                 Text("Height: ${details.height} decimeters")
                 Text("Weight: ${details.weight} hectograms")
                 Text("Types: ${details.types.joinToString(", ") { it.type.name.capitalize() }}")
                 Text("Abilities: ${details.abilities.joinToString(", ") { it.ability.name.capitalize() }}")
                 Text("Moves: ${details.moves.take(10).joinToString(", ") { it.move.name.capitalize() }}")
+
+                // Botón para agregar a favoritos
+                Button(
+                    onClick = {
+                        isFavorite = !isFavorite
+                        // Aquí puedes agregar lógica para almacenar los favoritos
+                        println("${details.name} ${if (isFavorite) "agregado a favoritos" else "eliminado de favoritos"}")
+                    },
+                    modifier = Modifier.fillMaxWidth().padding(8.dp)
+                ) {
+                    Text(text = if (isFavorite) "Eliminar de Favoritos" else "Agregar a Favoritos")
+                }
             } ?: run {
                 Text("Loading Pokémon details...")
             }
         }
     }
 }
+
+@Composable
+fun BottomBarLikeButton() {
+    Button(
+        onClick = {
+            // Acción al presionar el botón "Like"
+            println("Like button clicked")
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Text(text = "ver favorites")
+    }
+}
+
+
