@@ -80,6 +80,12 @@ fun ShowRegionPokemonScreen(regionName: String, navController: NavController) {
                             pokemonList = response.body()?.pokemon_entries ?: emptyList()
                         }
                     }
+                    "original-alola" -> {
+                        val response = PokemonDriverAdapter.api.getPokedexAlola()
+                        if (response.isSuccessful) {
+                            pokemonList = response.body()?.pokemon_entries ?: emptyList()
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

@@ -40,6 +40,9 @@ interface PokedexApi {
     @GET("pokedex/kalos-central/")
     suspend fun getPokedexkalos(): Response<PokemonResponse>
 
+    @GET("pokedex/original-alola/")
+    suspend fun getPokedexAlola(): Response<PokemonResponse>
+
     @GET("pokemon/{pokemonName}/")
     suspend fun getPokemonDetails(@Path("pokemonName") pokemonName: String): Response<PokemonDetail>
 
