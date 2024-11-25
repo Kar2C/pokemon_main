@@ -214,6 +214,7 @@ fun PokemonByTypeScreen(typeName: String, navController: NavController) {
 @Composable
 fun PokemonListScreen(navController: NavController) {
     var pokemonList by remember { mutableStateOf<List<Pokemon>>(emptyList()) }
+    var searchQuery by remember { mutableStateOf("") } // Estado para la búsqueda
     val coroutineScope = rememberCoroutineScope()
 
     // Realizar la llamada a la API para obtener los Pokémon
@@ -231,8 +232,15 @@ fun PokemonListScreen(navController: NavController) {
         }
     }
 
+    // Filtrar los Pokémon por la primera letra del nombre
+    val filteredPokemonList = pokemonList.filter { pokemon ->
+        pokemon.name.startsWith(searchQuery, ignoreCase = true)
+    }
+
     Scaffold(
-        topBar = { TopBar(navController) },
+        topBar = {
+            TopBar(navController)
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -240,19 +248,23 @@ fun PokemonListScreen(navController: NavController) {
                 .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(
-                text = "Pokémon",
-                fontSize = 24.sp,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+            // Barra de búsqueda en la parte superior
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it }, // Actualizar el estado con la búsqueda
+                label = { Text("Buscar Pokémon por letra") },
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                singleLine = true
             )
 
+            // Mostrar la lista filtrada de Pokémon
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(8.dp)
             ) {
-                items(pokemonList.size) { index ->
-                    val pokemon = pokemonList[index]
+                items(filteredPokemonList.size) { index ->
+                    val pokemon = filteredPokemonList[index]
                     Button(
                         onClick = {
                             // Navegar a la pantalla de detalles del Pokémon
@@ -267,7 +279,6 @@ fun PokemonListScreen(navController: NavController) {
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
