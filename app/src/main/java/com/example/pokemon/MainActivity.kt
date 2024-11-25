@@ -93,7 +93,6 @@ fun PokedexApp() {
                 PokemonByTypeScreen(typeName = typeName, navController = navController)
             }
 
-            // Rutas adicionales
             composable("pokemonDetail/{pokemonName}") { backStackEntry ->
                 val pokemonName = backStackEntry.arguments?.getString("pokemonName") ?: ""
                 PokemonDetailScreen(pokemonName = pokemonName, navController = navController)
@@ -149,7 +148,6 @@ fun ShowPokemonTypes(pokemonTypes: List<PokemonType>, navController: NavControll
     }
 }
 
-
 @Composable
 fun PokemonByTypeScreen(typeName: String, navController: NavController) {
     var pokemonList by remember { mutableStateOf<List<String>>(emptyList()) }
@@ -185,17 +183,25 @@ fun PokemonByTypeScreen(typeName: String, navController: NavController) {
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
-            // Mostrar los Pokémon del tipo
+            // Mostrar los Pokémon del tipo en botones
             if (pokemonList.isNotEmpty()) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(8.dp)
                 ) {
                     items(pokemonList.size) { index ->
-                        Text(
-                            text = pokemonList[index].capitalize(),
-                            modifier = Modifier.padding(4.dp)
-                        )
+                        val pokemonName = pokemonList[index]
+                        Button(
+                            onClick = {
+                                // Navegar a la pantalla de detalles del Pokémon
+                                navController.navigate("pokemonDetail/${pokemonName}")
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
+                        ) {
+                            Text(text = pokemonName.capitalize())
+                        }
                     }
                 }
             } else {
@@ -204,7 +210,6 @@ fun PokemonByTypeScreen(typeName: String, navController: NavController) {
         }
     }
 }
-
 
 @Composable
 fun PokemonListScreen(navController: NavController) {
