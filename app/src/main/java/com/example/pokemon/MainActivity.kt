@@ -415,7 +415,7 @@ fun BottomBarLikeButton() {
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Text(text = "ver favorites")
+        Text(text = "ver favoritesssss")
     }
 }
 
