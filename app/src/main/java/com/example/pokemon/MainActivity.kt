@@ -51,7 +51,6 @@ fun PokedexApp() {
     LaunchedEffect(Unit) {
         coroutineScope.launch {
             try {
-                // Llamamos al API para obtener los tipos de Pokémon
                 val response = PokemonDriverAdapter.api.getPokemonTypes()
                 if (response.isSuccessful) {
                     pokemonTypes = response.body()?.results ?: emptyList()
@@ -79,7 +78,6 @@ fun PokedexApp() {
         // Definimos la navegación
         NavHost(navController = navController, startDestination = "home") {
             composable("home") {
-                // Cuando se selecciona "Regiones", mostramos la lista de regiones
                 if (selectedTabIndex == 0) {
                     PokedexScreen(navController)  // Pantalla de regiones
                 } else if (selectedTabIndex == 1) {
@@ -89,12 +87,18 @@ fun PokedexApp() {
                 }
             }
 
+            // Nueva ruta para la pantalla de Pokémon por tipo
+            composable("pokemonByType/{typeName}") { backStackEntry ->
+                val typeName = backStackEntry.arguments?.getString("typeName") ?: ""
+                PokemonByTypeScreen(typeName = typeName, navController = navController)
+            }
+
+            // Rutas adicionales
             composable("pokemonDetail/{pokemonName}") { backStackEntry ->
                 val pokemonName = backStackEntry.arguments?.getString("pokemonName") ?: ""
                 PokemonDetailScreen(pokemonName = pokemonName, navController = navController)
             }
 
-            // Navegar a las regiones, si se seleccionan
             composable("region/{regionName}") { backStackEntry ->
                 val regionName = backStackEntry.arguments?.getString("regionName")
                 regionName?.let {
@@ -104,6 +108,7 @@ fun PokedexApp() {
         }
     }
 }
+
 
 @Composable
 fun ShowPokemonTypes(pokemonTypes: List<PokemonType>, navController: NavController) {
@@ -122,6 +127,7 @@ fun ShowPokemonTypes(pokemonTypes: List<PokemonType>, navController: NavControll
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
+            // Mostrar los tipos de Pokémon
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(8.dp)
@@ -130,10 +136,8 @@ fun ShowPokemonTypes(pokemonTypes: List<PokemonType>, navController: NavControll
                     val pokemonType = pokemonTypes[index]
                     Button(
                         onClick = {
-                            // Aquí puedes manejar la acción de selección del tipo
-                            // Por ejemplo, podrías navegar a una pantalla de Pokémon con ese tipo
-                            // Por ahora, simplemente se muestra el nombre
-                            println("Tipo seleccionado: ${pokemonType.name}")
+                            // Navegar a la pantalla de Pokémon por tipo
+                            navController.navigate("pokemonByType/${pokemonType.name}")
                         },
                         modifier = Modifier.fillMaxWidth().padding(4.dp)
                     ) {
@@ -144,6 +148,63 @@ fun ShowPokemonTypes(pokemonTypes: List<PokemonType>, navController: NavControll
         }
     }
 }
+
+
+@Composable
+fun PokemonByTypeScreen(typeName: String, navController: NavController) {
+    var pokemonList by remember { mutableStateOf<List<String>>(emptyList()) }
+    val coroutineScope = rememberCoroutineScope()
+
+    // Realizar la llamada a la API para obtener los Pokémon de este tipo
+    LaunchedEffect(typeName) {
+        coroutineScope.launch {
+            try {
+                val response = PokemonDriverAdapter.api.getPokemonByType(typeName)
+                if (response.isSuccessful) {
+                    // Extraemos los nombres de los Pokémon de la respuesta
+                    pokemonList = response.body()?.pokemon?.map { it.pokemon.name } ?: emptyList()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    Scaffold(
+        topBar = { TopBar(navController) },
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "Pokémon de tipo ${typeName.capitalize()}",
+                fontSize = 24.sp,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
+            // Mostrar los Pokémon del tipo
+            if (pokemonList.isNotEmpty()) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(8.dp)
+                ) {
+                    items(pokemonList.size) { index ->
+                        Text(
+                            text = pokemonList[index].capitalize(),
+                            modifier = Modifier.padding(4.dp)
+                        )
+                    }
+                }
+            } else {
+                Text("Cargando Pokémon...", modifier = Modifier.padding(8.dp))
+            }
+        }
+    }
+}
+
 
 @Composable
 fun PokemonListScreen(navController: NavController) {
