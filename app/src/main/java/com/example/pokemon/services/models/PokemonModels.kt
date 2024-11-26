@@ -93,3 +93,16 @@ data class Pokemon(
 data class PokemonTypeListResponse(
     val results: List<PokemonType>
 )
+
+data class PokemonTypeDetailResponse(
+    val pokemon: List<PokemonEntryDetail>
+)
+
+data class PokemonEntryDetail(
+    val pokemon: PokemonBasicInfo
+)
+
+data class PokemonBasicInfo(
+    val name: String,
+    val url: String
+)

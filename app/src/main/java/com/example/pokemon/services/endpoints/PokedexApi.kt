@@ -3,6 +3,7 @@ package com.example.pokemon.services.endpoints
 import com.example.pokemon.services.models.PokemonDetail
 import com.example.pokemon.services.models.PokemonListResponse
 import com.example.pokemon.services.models.PokemonResponse
+import com.example.pokemon.services.models.PokemonTypeDetailResponse
 import com.example.pokemon.services.models.PokemonTypeListResponse
 import com.example.pokemon.services.models.RegionResponse
 import retrofit2.Call
@@ -53,6 +54,10 @@ interface PokedexApi {
 
     @GET("type/")
     suspend fun getPokemonTypes(): Response<PokemonTypeListResponse>
+
+    @GET("type/{typeName}/")
+    suspend fun getPokemonByType(@Path("typeName") typeName: String): Response<PokemonTypeDetailResponse>
+
 }
 
 data class RegionResponse(val results: List<Region>)
