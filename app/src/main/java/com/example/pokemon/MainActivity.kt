@@ -17,7 +17,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,11 +26,7 @@ import com.example.pokemon.driverAdapters.PokemonDriverAdapter
 import com.example.pokemon.services.models.Pokemon
 import com.example.pokemon.services.models.PokemonDetail
 import com.example.pokemon.services.models.PokemonType
-import com.example.pokemon.services.roomDatabase.DatabaseClient
-import com.example.pokemon.services.roomDatabase.PokemonEntity
 import com.example.pokemon.ui.theme.PokemonTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -356,8 +351,6 @@ fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
     var pokemonDetails by remember { mutableStateOf<PokemonDetail?>(null) }
     var isFavorite by remember { mutableStateOf(false) }  // Estado para verificar si es favorito
     val coroutineScope = rememberCoroutineScope()
-    val pokemonDao = DatabaseClient.getInstance(LocalContext.current).pokemonDao()
-
 
     LaunchedEffect(pokemonName) {
         coroutineScope.launch {
@@ -385,13 +378,6 @@ fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
                 .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            LaunchedEffect(pokemonDetails?.name) {
-                pokemonDetails?.name?.let { name ->
-                    val existingPokemon = pokemonDao.getPokemonByName(name)
-                    isFavorite = existingPokemon != null
-                }
-            }
-
             pokemonDetails?.let { details ->
                 Text(text = details.name.capitalize(), fontSize = 24.sp)
                 Text("Height: ${details.height} decimeters")
@@ -404,25 +390,8 @@ fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
                 Button(
                     onClick = {
                         isFavorite = !isFavorite
-
-                        coroutineScope.launch {
-                            if(isFavorite){
-                                val pokemonEntity = PokemonEntity(
-                                    name = details.name,
-                                    height = details.height,
-                                    weight = details.weight,
-                                    types = details.types.joinToString(", ") { it.type.name },
-                                    abilities = details.abilities.joinToString(", ") { it.ability.name },
-                                    moves = details.moves.take(10).joinToString(", ") { it.move.name }
-                                )
-
-                                pokemonDao.insertPokemon(pokemonEntity);
-                                println("${details.name} ${ "Agregado a favoritos"}")
-                            }else{
-                                pokemonDao.deletePokemonByName(details.name)
-                                println("${details.name} ${ "Eliminado de favoritos"}")
-                            }
-                        }
+                        // Aquí puedes agregar lógica para almacenar los favoritos
+                        println("${details.name} ${if (isFavorite) "agregado a favoritos" else "eliminado de favoritos"}")
                     },
                     modifier = Modifier.fillMaxWidth().padding(8.dp)
                 ) {
@@ -437,50 +406,16 @@ fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
 
 @Composable
 fun BottomBarLikeButton() {
-
-    val pokemonDao = DatabaseClient.getInstance(LocalContext.current).pokemonDao()
-
-    // Estado para almacenar la lista de Pokémon obtenida de la base de datos
-    var pokemonList by remember { mutableStateOf<List<PokemonEntity>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(false) }
-
-    // Función para obtener los Pokémon de la DB
-    fun loadPokemonList() {
-        // Usamos el lanzador de corutinas para hacer la consulta en un hilo de fondo
-        isLoading = true
-        CoroutineScope(Dispatchers.IO).launch {
-            // Realizamos la consulta (simula obtener todos los Pokémon)
-            val allPokemons = pokemonDao.getAllPokemons() // Esta consulta debe estar implementada en tu DAO
-            // Regresamos al hilo principal para actualizar el estado
-            pokemonList = allPokemons
-            isLoading = false
-        }
-    }
-
     Button(
         onClick = {
+            // Acción al presionar el botón "Like"
             println("Like button clicked")
-            loadPokemonList() // Cargar los Pokémon al hacer click
-
         },
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
         Text(text = "ver favorites")
-    }
-
-    if (isLoading) {
-        Text("Cargando...")
-    } else if (pokemonList.isEmpty()) {
-        Text("No tienes favoritos.")
-    } else {
-        // Mostrar los Pokémon obtenidos
-        Column(modifier = Modifier.fillMaxWidth()) {
-            pokemonList.forEach { pokemon ->
-                Text(text = pokemon.name, modifier = Modifier.padding(8.dp))
-            }
-        }
     }
 }
 
