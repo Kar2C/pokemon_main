@@ -324,7 +324,10 @@ fun PokedexScreen(navController: NavController) {
             )
             // Definir un color rojo personalizado
             val redColor = Color(0xFFEE1C25) // Un rojo fuerte similar al de Pokémon
-            val buttonTextStyle = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold) // Estilo de texto más grande
+            val buttonTextStyle = TextStyle(
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            ) // Estilo de texto más grande
 
             // Fila de botones Kanto y Hoenn
             Row(
@@ -474,14 +477,12 @@ fun PokedexScreen(navController: NavController) {
 }
 
 
-
 @Composable
 fun TopBar(navController: NavController) {
-    Row(
+    Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .fillMaxWidth() // Asegura que el Box ocupe todo el ancho de la pantalla
+            .padding(16.dp) // Padding general alrededor
     ) {
         IconButton(onClick = { navController.navigate("home") }) {
             Icon(
@@ -489,7 +490,6 @@ fun TopBar(navController: NavController) {
                 contentDescription = "Home",
             )
         }
-        Spacer(modifier = Modifier.weight(1f))
         Text(
             text = "Pokedex",
             fontSize = 24.sp,
