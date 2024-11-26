@@ -17,8 +17,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -103,6 +107,10 @@ fun PokedexApp() {
                 PokemonDetailScreen(pokemonName = pokemonName, navController = navController)
             }
 
+            composable("favorites") {
+                FavoritesScreen(navController)  // Navegación a la pantalla de favoritos
+            }
+
             composable("region/{regionName}") { backStackEntry ->
                 val regionName = backStackEntry.arguments?.getString("regionName")
                 regionName?.let {
@@ -112,7 +120,6 @@ fun PokedexApp() {
         }
     }
 }
-
 
 @Composable
 fun ShowPokemonTypes(pokemonTypes: List<PokemonType>, navController: NavController) {
@@ -143,7 +150,9 @@ fun ShowPokemonTypes(pokemonTypes: List<PokemonType>, navController: NavControll
                             // Navegar a la pantalla de Pokémon por tipo
                             navController.navigate("pokemonByType/${pokemonType.name}")
                         },
-                        modifier = Modifier.fillMaxWidth().padding(4.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp)
                     ) {
                         Text(text = pokemonType.name.capitalize())
                     }
@@ -258,7 +267,9 @@ fun PokemonListScreen(navController: NavController) {
                 value = searchQuery,
                 onValueChange = { searchQuery = it }, // Actualizar el estado con la búsqueda
                 label = { Text("Buscar Pokémon por letra") },
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
                 singleLine = true
             )
 
@@ -275,7 +286,9 @@ fun PokemonListScreen(navController: NavController) {
                             // Navegar a la pantalla de detalles del Pokémon
                             navController.navigate("pokemonDetail/${pokemon.name}")
                         },
-                        modifier = Modifier.fillMaxWidth().padding(4.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp)
                     ) {
                         Text(text = pokemon.name.capitalize())
                     }
@@ -291,8 +304,7 @@ fun PokedexScreen(navController: NavController) {
     Scaffold(
         topBar = { TopBar(navController) },
         bottomBar = {
-            // Agregar botón Like en la parte inferior
-            BottomBarLikeButton()
+            BottomBarLikeButton(navController = navController)
         },
     ) { innerPadding ->
         Column(
@@ -300,111 +312,168 @@ fun PokedexScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            Button(
+            Text(
+                text = "Regiones",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                onClick = {
-                    navController.navigate("region/Kanto")
-                }
+                textAlign = TextAlign.Center,
+                style = TextStyle(
+                    fontSize = 28.sp
+                )
+            )
+            // Definir un color rojo personalizado
+            val redColor = Color(0xFFEE1C25) // Un rojo fuerte similar al de Pokémon
+            val buttonTextStyle = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold) // Estilo de texto más grande
+
+            // Fila de botones Kanto y Hoenn
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Ver Pokémon de Kanto")
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        navController.navigate("region/Kanto")
+                    },
+                ) {
+                    Text("Kanto", style = buttonTextStyle)
+                }
+
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        navController.navigate("region/Hoenn")
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = redColor) // Establece el color de fondo aquí
+                ) {
+                    Text("Hoenn", style = buttonTextStyle)
+                }
             }
 
-            Button(
+            // Fila de botones Galar y Paldea
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                onClick = {
-                    navController.navigate("region/Hoenn")
-                }
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Ver Pokémon de Hoenn")
-            }
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                onClick = {
-                    navController.navigate("region/Galar")
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        navController.navigate("region/Galar")
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = redColor)
+                ) {
+                    Text("Galar", style = buttonTextStyle)
                 }
-            ) {
-                Text("Ver Pokémon de Galar")
-            }
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                onClick = {
-                    navController.navigate("region/Paldea")
+
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        navController.navigate("region/Paldea")
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = redColor)
+                ) {
+                    Text("Paldea", style = buttonTextStyle)
                 }
-            ) {
-                Text("Ver Pokémon de Paldea")
-            }
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                onClick = {
-                    navController.navigate("region/Hisui")
-                }
-            ) {
-                Text("Ver Pokémon de Hisui")
-            }
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                onClick = {
-                    navController.navigate("region/original-johto")
-                }
-            ) {
-                Text("Ver Pokémon de Johto")
-            }
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                onClick = {
-                    navController.navigate("region/original-sinnoh")
-                }
-            ) {
-                Text("Ver Pokémon de Sinnoh")
-            }
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                onClick = {
-                    navController.navigate("region/original-unova")
-                }
-            ) {
-                Text("Ver Pokémon de Unova")
-            }
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                onClick = {
-                    navController.navigate("region/kalos-central")
-                }
-            ) {
-                Text("Ver Pokémon de Kalos")
-            }
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                onClick = {
-                    navController.navigate("region/original-alola")
-                }
-            ) {
-                Text("Ver Pokémon de Alola")
             }
 
+            // Fila de botones Hisui y Johto
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        navController.navigate("region/Hisui")
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = redColor)
+                ) {
+                    Text("Hisui", style = buttonTextStyle)
+                }
+
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        navController.navigate("region/original-johto")
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = redColor)
+                ) {
+                    Text("Johto", style = buttonTextStyle)
+                }
+            }
+
+            // Fila de botones Sinnoh y Unova
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        navController.navigate("region/original-sinnoh")
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = redColor)
+                ) {
+                    Text("Sinnoh", style = buttonTextStyle)
+                }
+
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        navController.navigate("region/original-unova")
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = redColor)
+                ) {
+                    Text("Unova", style = buttonTextStyle)
+                }
+            }
+
+            // Fila de botones Kalos y Alola
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        navController.navigate("region/kalos-central")
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = redColor)
+                ) {
+                    Text("Kalos", style = buttonTextStyle)
+                }
+
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        navController.navigate("region/original-alola")
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = redColor)
+                ) {
+                    Text("Alola", style = buttonTextStyle)
+                }
+            }
         }
     }
 }
+
+
 
 @Composable
 fun TopBar(navController: NavController) {
@@ -451,8 +520,8 @@ fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
     Scaffold(
         topBar = { TopBar(navController) },
         bottomBar = {
-            // Botón "Like" en la parte inferior de todas las pantallas
-            BottomBarLikeButton()
+            // Pasamos el navController a BottomBarLikeButton
+            BottomBarLikeButton(navController = navController)
         },
     ) { innerPadding ->
         Column(
@@ -477,7 +546,11 @@ fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
                 Text("Weight: ${details.weight} hectograms")
                 Text("Types: ${details.types.joinToString(", ") { it.type.name.capitalize() }}")
                 Text("Abilities: ${details.abilities.joinToString(", ") { it.ability.name.capitalize() }}")
-                Text("Moves: ${details.moves.take(10).joinToString(", ") { it.move.name.capitalize() }}")
+                Text(
+                    "Moves: ${
+                        details.moves.take(10).joinToString(", ") { it.move.name.capitalize() }
+                    }"
+                )
 
                 // Botón para agregar a favoritos
                 Button(
@@ -485,25 +558,28 @@ fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
                         isFavorite = !isFavorite
 
                         coroutineScope.launch {
-                            if(isFavorite){
+                            if (isFavorite) {
                                 val pokemonEntity = PokemonEntity(
                                     name = details.name,
                                     height = details.height,
                                     weight = details.weight,
                                     types = details.types.joinToString(", ") { it.type.name },
                                     abilities = details.abilities.joinToString(", ") { it.ability.name },
-                                    moves = details.moves.take(10).joinToString(", ") { it.move.name }
+                                    moves = details.moves.take(10)
+                                        .joinToString(", ") { it.move.name }
                                 )
 
                                 pokemonDao.insertPokemon(pokemonEntity);
-                                println("${details.name} ${ "Agregado a favoritos"}")
-                            }else{
+                                println("${details.name} ${"Agregado a favoritos"}")
+                            } else {
                                 pokemonDao.deletePokemonByName(details.name)
-                                println("${details.name} ${ "Eliminado de favoritos"}")
+                                println("${details.name} ${"Eliminado de favoritos"}")
                             }
                         }
                     },
-                    modifier = Modifier.fillMaxWidth().padding(8.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
                 ) {
                     Text(text = if (isFavorite) "Eliminar de Favoritos" else "Agregar a Favoritos")
                 }
@@ -515,11 +591,31 @@ fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
 }
 
 @Composable
-fun BottomBarLikeButton() {
+fun BottomBarLikeButton(navController: NavController) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth() // Asegura que el Box ocupe todo el ancho de la pantalla
+            .padding(16.dp) // Padding general alrededor
+    ) {
+        IconButton(
+            onClick = {
+                // Navegar a la pantalla de favoritos
+                navController.navigate("favorites")
+            },
+            modifier = Modifier.align(Alignment.CenterEnd) // Alinea el botón a la derecha
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_favorite),
+                contentDescription = "Favoritos",
+                modifier = Modifier.padding(4.dp) // Ajustar tamaño y espaciado del ícono
+            )
+        }
+    }
+}
 
+@Composable
+fun FavoritesScreen(navController: NavController) {
     val pokemonDao = DatabaseClient.getInstance(LocalContext.current).pokemonDao()
-
-    // Estado para almacenar la lista de Pokémon obtenida de la base de datos
     var pokemonList by remember { mutableStateOf<List<PokemonEntity>>(emptyList()) }
     var isLoading by remember { mutableStateOf(false) }
 
@@ -529,38 +625,44 @@ fun BottomBarLikeButton() {
         isLoading = true
         CoroutineScope(Dispatchers.IO).launch {
             // Realizamos la consulta (simula obtener todos los Pokémon)
-            val allPokemons = pokemonDao.getAllPokemons() // Esta consulta debe estar implementada en tu DAO
+            val allPokemons =
+                pokemonDao.getAllPokemons() // Esta consulta debe estar implementada en tu DAO
             // Regresamos al hilo principal para actualizar el estado
             pokemonList = allPokemons
             isLoading = false
         }
     }
 
-    Button(
-        onClick = {
-            println("Like button clicked")
-            loadPokemonList() // Cargar los Pokémon al hacer click
-
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(text = "ver favorites")
+    // Cargar los Pokémon favoritos
+    LaunchedEffect(Unit) {
+        loadPokemonList()
     }
 
-    if (isLoading) {
-        Text("Cargando...")
-    } else if (pokemonList.isEmpty()) {
-        Text("No tienes favoritos.")
-    } else {
-        // Mostrar los Pokémon obtenidos
-        Column(modifier = Modifier.fillMaxWidth()) {
-            pokemonList.forEach { pokemon ->
-                Text(text = pokemon.name, modifier = Modifier.padding(8.dp))
+    Scaffold(
+        topBar = { TopBar(navController) }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            // Verificando el estado de carga y la lista de favoritos
+            if (isLoading) {
+                Text("Cargando...")
+            } else if (pokemonList.isEmpty()) {
+                Text("No tienes favoritos.", modifier = Modifier.padding(8.dp))
+            } else {
+                // Mostrar los Pokémon obtenidos
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    pokemonList.forEach { pokemon ->
+                        Text(text = pokemon.name, modifier = Modifier.padding(8.dp))
+                    }
+                }
             }
         }
     }
 }
+
 
 
