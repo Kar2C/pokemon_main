@@ -32,7 +32,12 @@ data class PokemonDetail(
     val types: List<PokemonTypeEntry>, // Tipos del Pokémon
     val abilities: List<PokemonAbilityEntry>, // Habilidades
     val species: PokemonSpeciesDetail, // Información sobre la especie
-    val moves: List<PokemonMoveEntry> // Movimientos (ataques)
+    val moves: List<PokemonMoveEntry>, // Movimientos (ataques)
+    val sprites: PokemonSprites // Añadimos la propiedad para los sprites
+)
+
+data class PokemonSprites(
+    val front_default: String? // URL de la imagen frontal por defecto
 )
 
 data class PokemonTypeEntry(
@@ -87,7 +92,8 @@ data class PokemonListResponse(
 
 data class Pokemon(
     val name: String,
-    val url: String
+    val url: String,
+    var imageUrl: String? = null // Campo para la URL de la imagen
 )
 
 data class PokemonTypeListResponse(

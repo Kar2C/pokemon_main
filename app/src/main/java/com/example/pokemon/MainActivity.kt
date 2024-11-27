@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.*
+import coil.compose.AsyncImage
 import com.example.pokemon.driverAdapters.PokemonDriverAdapter
 import com.example.pokemon.services.models.Pokemon
 import com.example.pokemon.services.models.PokemonDetail
@@ -339,6 +341,7 @@ fun PokedexScreen(navController: NavController) {
                     onClick = {
                         navController.navigate("region/Kanto")
                     },
+                    colors = ButtonDefaults.buttonColors(containerColor = redColor) // Establece el color de fondo aquí
                 ) {
                     Text("Kanto", style = buttonTextStyle)
                 }
@@ -473,8 +476,6 @@ fun PokedexScreen(navController: NavController) {
     }
 }
 
-
-
 @Composable
 fun TopBar(navController: NavController) {
     Row(
@@ -501,6 +502,7 @@ fun TopBar(navController: NavController) {
 fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
     var pokemonDetails by remember { mutableStateOf<PokemonDetail?>(null) }
     var isFavorite by remember { mutableStateOf(false) }  // Estado para verificar si es favorito
+    var pokemonImageUrl by remember { mutableStateOf<String?>(null) }  // URL de la imagen
     val coroutineScope = rememberCoroutineScope()
     val pokemonDao = DatabaseClient.getInstance(LocalContext.current).pokemonDao()
 
@@ -510,6 +512,9 @@ fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
                 val response = PokemonDriverAdapter.api.getPokemonDetails(pokemonName)
                 if (response.isSuccessful) {
                     pokemonDetails = response.body()
+                    pokemonDetails?.sprites?.front_default?.let {
+                        pokemonImageUrl = it  // Obtener URL de la imagen predeterminada (front_default)
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -520,7 +525,6 @@ fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
     Scaffold(
         topBar = { TopBar(navController) },
         bottomBar = {
-            // Pasamos el navController a BottomBarLikeButton
             BottomBarLikeButton(navController = navController)
         },
     ) { innerPadding ->
@@ -530,8 +534,6 @@ fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
                 .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-
-
             LaunchedEffect(pokemonDetails?.name) {
                 pokemonDetails?.name?.let { name ->
                     val existingPokemon = pokemonDao.getPokemonByName(name)
@@ -539,8 +541,21 @@ fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
                 }
             }
 
-
             pokemonDetails?.let { details ->
+                // Mostrar la imagen predeterminada
+                pokemonImageUrl?.let { imageUrl ->
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = "Imagen de ${details.name}",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(250.dp) // Ajustar tamaño de la imagen si es necesario
+                            .padding(8.dp),
+                        contentScale = ContentScale.Crop // Para ajustar la imagen si es necesario
+                    )
+                }
+
+                // Mostrar detalles del Pokémon
                 Text(text = details.name.capitalize(), fontSize = 24.sp)
                 Text("Height: ${details.height} decimeters")
                 Text("Weight: ${details.weight} hectograms")
@@ -569,7 +584,7 @@ fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
                                         .joinToString(", ") { it.move.name }
                                 )
 
-                                pokemonDao.insertPokemon(pokemonEntity);
+                                pokemonDao.insertPokemon(pokemonEntity)
                                 println("${details.name} ${"Agregado a favoritos"}")
                             } else {
                                 pokemonDao.deletePokemonByName(details.name)
@@ -633,7 +648,6 @@ fun FavoritesScreen(navController: NavController) {
         }
     }
 
-    // Cargar los Pokémon favoritos
     LaunchedEffect(Unit) {
         loadPokemonList()
     }
@@ -653,16 +667,25 @@ fun FavoritesScreen(navController: NavController) {
             } else if (pokemonList.isEmpty()) {
                 Text("No tienes favoritos.", modifier = Modifier.padding(8.dp))
             } else {
-                // Mostrar los Pokémon obtenidos
+                // Mostrar los Pokémon obtenidos como botones
                 Column(modifier = Modifier.fillMaxWidth()) {
                     pokemonList.forEach { pokemon ->
-                        Text(text = pokemon.name, modifier = Modifier.padding(8.dp))
+                        Button(
+                            onClick = {
+                                // Navegar a la pantalla de detalles del Pokémon
+                                navController.navigate("pokemonDetail/${pokemon.name}")
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
+                        ) {
+                            Text(text = pokemon.name.capitalize())
+                        }
                     }
                 }
             }
         }
     }
 }
-
 
 
