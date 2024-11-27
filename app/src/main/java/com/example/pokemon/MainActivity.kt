@@ -33,6 +33,7 @@ import com.example.pokemon.driverAdapters.PokemonDriverAdapter
 import com.example.pokemon.services.models.Pokemon
 import com.example.pokemon.services.models.PokemonDetail
 import com.example.pokemon.services.models.PokemonType
+import com.example.pokemon.services.models.toPokemonDetail
 import com.example.pokemon.services.roomDatabase.DatabaseClient
 import com.example.pokemon.services.roomDatabase.PokemonEntity
 import com.example.pokemon.ui.theme.PokemonTheme
@@ -509,15 +510,31 @@ fun PokemonDetailScreen(pokemonName: String, navController: NavController) {
     LaunchedEffect(pokemonName) {
         coroutineScope.launch {
             try {
+
                 val response = PokemonDriverAdapter.api.getPokemonDetails(pokemonName)
-                if (response.isSuccessful) {
-                    pokemonDetails = response.body()
-                    pokemonDetails?.sprites?.front_default?.let {
-                        pokemonImageUrl = it  // Obtener URL de la imagen predeterminada (front_default)
+                    if (response.isSuccessful) {
+                        pokemonDetails = response.body()
+                        pokemonDetails?.sprites?.front_default?.let {
+                            pokemonImageUrl = it  // Obtener URL de la imagen predeterminada (front_default)
+                        }
+                    }else{
+                        val existingPokemon: PokemonEntity? = pokemonDao.getPokemonByName(pokemonName)
+                        if(existingPokemon != null){
+                            pokemonDetails = existingPokemon.toPokemonDetail()
+                        }else{
+                            println("Pokémon no encontrado en la DB")
+                        }
                     }
-                }
+
             } catch (e: Exception) {
                 e.printStackTrace()
+                val existingPokemon: PokemonEntity? = pokemonDao.getPokemonByName(pokemonName)
+                if(existingPokemon != null){
+                    pokemonDetails = existingPokemon.toPokemonDetail()
+                }else{
+                    println("Pokémon no encontrado en la DB")
+                }
+
             }
         }
     }

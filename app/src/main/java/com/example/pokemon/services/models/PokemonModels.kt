@@ -1,5 +1,7 @@
 package com.example.pokemon.services.models
 
+import com.example.pokemon.services.roomDatabase.PokemonEntity
+
 data class PokemonResponse(
     val id: Int,
     val name: String,
@@ -35,6 +37,53 @@ data class PokemonDetail(
     val moves: List<PokemonMoveEntry>, // Movimientos (ataques)
     val sprites: PokemonSprites // Añadimos la propiedad para los sprites
 )
+
+fun PokemonEntity.toPokemonDetail(): PokemonDetail {
+    return PokemonDetail(
+        name = this.name,
+        height = this.height,
+        weight = this.weight,
+        types = this.types.split(", ").map { typeName ->
+            PokemonTypeEntry(
+                type = PokemonType(
+                    name = typeName,
+                    url = "https://pokeapi.co/api/v2/type/$typeName" // URL simulada
+                )
+            )
+        },
+        abilities = this.abilities.split(", ").map { abilityName ->
+            PokemonAbilityEntry(
+                ability = Ability(
+                    name = abilityName,
+                    url = "https://pokeapi.co/api/v2/ability/$abilityName" // URL simulada
+                )
+            )
+        },
+        species = PokemonSpeciesDetail(
+            name = this.name,
+            url = "https://pokeapi.co/api/v2/pokemon-species/$name", // URL simulada
+            flavor_text_entries = listOf(
+                FlavorTextEntry(
+                    flavor_text = "Descripción por defecto de $name.",
+                    language = Language(name = "en")
+                )
+            ),
+            category = Category(
+                name = "Unknown Category" // Categoría por defect
+            )
+        ),
+        moves = this.moves.split(", ").map { moveName ->
+            PokemonMoveEntry(
+                move = PokemonMove(
+                    name = moveName
+                )
+            )
+        },
+        sprites = PokemonSprites(
+            front_default = "https://pokeapi.co/media/sprites/pokemon/$name.png" // URL simulada
+        )
+    )
+}
 
 data class PokemonSprites(
     val front_default: String? // URL de la imagen frontal por defecto
